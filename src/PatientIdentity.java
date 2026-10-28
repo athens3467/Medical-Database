@@ -1,3 +1,4 @@
+import java.text.SimpleDateFormat;
 import java.util.Date;
 
 public class PatientIdentity {
@@ -5,8 +6,20 @@ public class PatientIdentity {
     private Date dateOfBirth;
 
     public PatientIdentity(Identity identity, Date dateOfBirth) {
+        if (identity == null || dateOfBirth == null) {
+            throw new IllegalArgumentException("Invalid patient identity.");
+        }
+
         this.identity = identity;
-        this.dateOfBirth = dateOfBirth;
+        this.dateOfBirth = new Date(dateOfBirth.getTime());
+    }
+
+    public Identity getIdentity() {
+        return identity;
+    }
+
+    public Date getDateOfBirth() {
+        return new Date(dateOfBirth.getTime());
     }
 
     public boolean match(PatientIdentity other) {
@@ -14,19 +27,31 @@ public class PatientIdentity {
             return false;
         }
 
-        return identity.match(other.identity)
-                && dateOfBirth.compareTo(other.dateOfBirth) == 0;
+        return identity.match(other.identity) &&
+                dateOfBirth.equals(other.dateOfBirth);
     }
 
     public boolean isLessThan(PatientIdentity other) {
-        if (identity.match(other.identity)) {
-            return dateOfBirth.compareTo(other.dateOfBirth) < 0;
+        if (other == null) {
+            return false;
         }
 
-        return identity.isLessThan(other.identity);
+        if (identity.isLessThan(other.identity)) {
+            return true;
+        }
+
+        if (other.identity.isLessThan(identity)) {
+            return false;
+        }
+
+        return dateOfBirth.before(other.dateOfBirth);
     }
 
     public String toString() {
-        return identity.toString() + ", " + dateOfBirth.toString();
+        SimpleDateFormat format =
+                new SimpleDateFormat("yyyy-MM-dd");
+
+        return identity.toString() + " | " +
+                format.format(dateOfBirth);
     }
 }

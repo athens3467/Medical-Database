@@ -3,18 +3,28 @@ public class Identity {
     private String lastName;
 
     public Identity(String firstName, String lastName) {
-        this.firstName = firstName;
-        this.lastName = lastName;
+        if (firstName == null || lastName == null ||
+                firstName.trim().isEmpty() ||
+                lastName.trim().isEmpty()) {
+            throw new IllegalArgumentException("Invalid name.");
+        }
+
+        this.firstName = firstName.trim();
+        this.lastName = lastName.trim();
     }
 
-    public Identity(String firstName, String lastName, boolean lastNameFirst) {
-        if (lastNameFirst) {
-            this.firstName = lastName;
-            this.lastName = firstName;
-        } else {
-            this.firstName = firstName;
-            this.lastName = lastName;
-        }
+    public Identity(String firstName, String lastName,
+                    boolean lastNameFirst) {
+        this(lastNameFirst ? lastName : firstName,
+                lastNameFirst ? firstName : lastName);
+    }
+
+    public String getFirstName() {
+        return firstName;
+    }
+
+    public String getLastName() {
+        return lastName;
     }
 
     public String fullname() {
@@ -26,28 +36,27 @@ public class Identity {
             return false;
         }
 
-        return firstName.toLowerCase().equals(other.firstName.toLowerCase())
-                && lastName.toLowerCase().equals(other.lastName.toLowerCase());
+        return firstName.equalsIgnoreCase(other.firstName) &&
+                lastName.equalsIgnoreCase(other.lastName);
     }
 
     public boolean isLessThan(Identity other) {
-        int lastComparison = lastName.toLowerCase().compareTo(other.lastName.toLowerCase());
-
-        if (lastComparison < 0) {
-            return true;
-        }
-
-        if (lastComparison > 0) {
+        if (other == null) {
             return false;
         }
 
-        int firstComparison = firstName.toLowerCase().compareTo(other.firstName.toLowerCase());
+        int comparison =
+                lastName.compareToIgnoreCase(other.lastName);
 
-        if (firstComparison < 0) {
+        if (comparison < 0) {
             return true;
         }
 
-        return false;
+        if (comparison > 0) {
+            return false;
+        }
+
+        return firstName.compareToIgnoreCase(other.firstName) < 0;
     }
 
     public String toString() {
